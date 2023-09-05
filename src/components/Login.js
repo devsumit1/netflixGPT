@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react'
 import Header from './Header'
 import { checkValidateData } from '../utils/validate'
 import { auth } from '../utils/firebase'
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 
 
 const Login = () => {
@@ -22,9 +22,9 @@ const Login = () => {
     const handleButtonClick = () => {
         //Validate the form data
 
-        console.log(email.current.value)
+        console.log(email?.current?.value)
         console.log(password)
-        const message = checkValidateData(email.current.value, password.current.value, name.current.value)
+        const message = checkValidateData(email?.current?.value, password?.current?.value, name?.current?.value)
         console.log(message)
         setErrorMessage(message)
 
@@ -33,7 +33,7 @@ const Login = () => {
         if (!isSignInForm) {
             // Sign Up Logic
 
-            createUserWithEmailAndPassword(auth, email.current.value, password.current.value)
+            createUserWithEmailAndPassword(auth, email?.current?.value, password?.current?.value)
                 .then((userCredential) => {
                     // Signed in 
                     const user = userCredential.user;
@@ -49,7 +49,17 @@ const Login = () => {
 
         }
         else {
-            //Sign in Logic
+            signInWithEmailAndPassword(auth, email?.current?.value, password?.current?.value)
+                .then((userCredential) => {
+                    // Signed in 
+                    const user = userCredential.user;
+                    // ...
+                })
+                .catch((error) => {
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                    setErrorMessage(errorCode, errorMessage)
+                });
         }
         //Sign / Sign Up
     }
@@ -68,7 +78,7 @@ const Login = () => {
                 <button className='p-4 my-6 bg-red-700 w-full rounded-lg' onClick={handleButtonClick}>{isSignInForm ? "Sign In" : "Sign Up"}</button>
                 <p className='py-4' onClick={toggleSignInForm}>{isSignInForm ? "New to Netflix? Sign Up Now" : "Already registered? Sign In Now"}</p>
 
-            </form>
+            </form>            
         </div>
     )
 }
